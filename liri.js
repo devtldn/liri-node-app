@@ -181,6 +181,9 @@ if (userReq === "my-tweets") {
             console.log(` Rotten Tomatoes:  ${rottTom} \n `);
         };
     });
+
+
+// Do What It Says
 } else if (userReq === "do-what-it-says") {
     fs.readFile("random.txt", "utf-8", function(err, data) {
         if (err) {
@@ -219,6 +222,13 @@ if (userReq === "my-tweets") {
             };
         };
     });
+
 } else {
-    return false;
+    if (!userReq) {
+        console.log("\n* * * * * INITIALIZATION FAILURE * * * * * ");
+        console.log("\nPlease include a program command when you launch liri.js. \n");
+        console.log("Commands: \n1. my-tweets \n2. spotify-this-song '<song name>' \n3. movie-this '<movie title>' \n4. do-what-it-says");
+    } else {
+        return false;
+    };
 };
