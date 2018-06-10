@@ -226,8 +226,8 @@ if (userReq === "my-tweets") {
 } else {
     if (!userReq) {
         console.log("\n* * * * * INITIALIZATION FAILURE * * * * * ");
-        console.log("\nPlease include a program command when you launch liri.js. \n");
-        console.log("Commands: \n1. my-tweets \n2. spotify-this-song '<song name>' \n3. movie-this '<movie title>' \n4. do-what-it-says");
+        console.log("\nPlease include a program command when you launch liri.js. ");
+        console.log("\nCommands: \n1. my-tweets \n2. spotify-this-song '<song name>' \n3. movie-this '<movie title>' \n4. do-what-it-says");
     } else {
         return false;
     };
