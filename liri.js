@@ -1,65 +1,186 @@
 require("dotenv").config();
 
-
 var Twitter = require('twitter');
 var keysTwit = require('./keys.js');
-var clientTwit = new Twitter(keysTwit.twitter);
-
-var userReq = process.argv[2];
-
-var paramsTwit = {
-    count: 20,
-    exclude_replies: true,
-    include_rts: false
-};
-
-if (userReq === "my-tweets") {
-    clientTwit.get('statuses/user_timeline', paramsTwit, retData);
-
-    function retData(err, tweets, response) {
-        console.log(` <-------------------- USER'S RECENT TWEETS --------------------> `);
-        for (var t = 0; t < tweets.length; t++) {
-            // console.log(tweets);
-            console.log(` "${tweets[t].text}" on ${tweets[t].created_at} `);
-        };
-    }
-};
-
-
-
-
-/*
-2. `node liri.js spotify-this-song '<song name here>'`
-
-    * This will show the following information about the song in your terminal / bash window
-
-        * Artist(s)
-
-        * The song's name
-
-            * A preview link of the song from Spotify
-
-                * The album that the song is from
-
-                    * If no song is provided then your program will default to "The Sign" by Ace of Base.
-   
-   * You will utilize the[node - spotify - api](https://www.npmjs.com/package/node-spotify-api) package in order to retrieve song information from the Spotify API.
-   
-   * Like the Twitter API, the Spotify API requires you sign up as a developer to generate the necessary credentials.You can follow these steps in order to generate a ** client id ** and ** client secret **:
-
-   * Step One: Visit < https://developer.spotify.com/my-applications/#!/>
-   
-   * Step Two: Either login to your existing Spotify account or create a new one(a free account is fine) and log in.
-
-   * Step Three: Once logged in, navigate to < https://developer.spotify.com/my-applications/#!/applications/create> to register a new application to be used with the Spotify API. You can fill in whatever you'd like for these fields. When finished, click the "complete" button.
-
-   * Step Four: On the next screen, scroll down to where you see your client id and client secret.Copy these values down somewhere, you'll need them to use the Spotify API and the [node-spotify-api package](https://www.npmjs.com/package/node-spotify-api).
-*/
-
 
 var Spotify = require('node-spotify-api');
 var keysSpot = require('./keys.js');
+
+var request = require("request");
+var fs = require("fs");
+
+var clientTwit = new Twitter(keysTwit.twitter);
 var clientSpot = new Spotify(keysSpot.spotify);
 
-// console.log(clientSpot);
+var userReq = process.argv[2];
+var userSearch = process.argv[3];
 
+var queryURL = ` http://www.omdbapi.com/?t=${userSearch}&y=&plot=short&apikey=trilogy `;
+var mrNobody = "http://www.omdbapi.com/?t=mr+nobody&y=&plot=short&apikey=trilogy";
+
+
+// Twitter
+if (userReq === "my-tweets") {
+    var paramsTwit = {
+        count: 20,
+        exclude_replies: true,
+        include_rts: false
+    };
+
+    clientTwit.get('statuses/user_timeline', paramsTwit, retData);
+
+    function retData(err, tweets) {
+        if (err) {
+            console.log(` \n${err}: \nPlease revise your program. \n `);
+
+        } else {
+            console.log("\n");
+            console.log("                           ✧                          ✧                           ");
+            console.log("                          ✦     YOUR RECENT TWEETS     ✦                           ");
+            console.log("                           ✧                          ✧                           ");
+            console.log("\n");
+
+            for (var t = 0; t < tweets.length; t++) {
+                // console.log(tweets);
+                var tweetContent = tweets[t].text;
+                var tweentTimeStamp = tweets[t].created_at;
+
+                console.log(` ${tweentTimeStamp}: \n"${tweetContent}" \n `);
+            };
+        };
+    }
+
+
+// Spotify
+} else if (userReq === "spotify-this-song" && !userSearch) {
+    clientSpot.search ({
+        type: 'track',
+        query: 'The Sign'
+    }, function(err, music) {
+        if (err) {
+            console.log(` \n${err}: \nPlease revise your program. \n `);
+
+        } else {
+            console.log("\nRETREIVING SAMPLE RESULTS... \n\n");
+
+            console.log("              ✰                    ✰            ");
+            console.log("            ✰     SAMPLE RESULTS     ✰            ");
+            console.log("              ✰                    ✰            ");
+            console.log("\n");
+
+            var searchInfo = music.tracks.items[7];
+            var theSign = searchInfo.album.name;
+            var aoB = searchInfo.album.artists[0].name;
+            var albumTitle = searchInfo.album.name;
+            var prevURL = searchInfo.external_urls.spotify;
+
+            console.log(`                 Song: ${theSign} \n `);
+            console.log(`               Artist: ${aoB} \n `);
+            console.log(`                Album: ${albumTitle} \n `);
+            console.log(`    Log-in to preview: ${prevURL} \n `);
+        };
+    });
+
+} else if (userReq === "spotify-this-song" && userSearch) {
+    clientSpot.search({
+        type: 'track',
+        query: userSearch
+    }, function (err, music) {
+        if (err) {
+            console.log(` \n${err}: \nPlease revise your program. \n `);
+
+        } else {
+            console.log(` \nSEARCHING: '${userSearch}' \n\n`);
+
+            console.log("              ✰                  ✰            ");
+            console.log("            ✰     YOUR RESULTS     ✰            ");
+            console.log("              ✰                  ✰            ");
+            console.log("\n");
+
+            var searchInfo = music.tracks.items[0];
+            var artistName = searchInfo.artists[0].name;
+            var songTitle = searchInfo.name;
+            var albumTitle = searchInfo.album.name;
+            var prevURL = searchInfo.external_urls.spotify;
+
+
+            console.log(`               Artist: ${artistName} \n `);
+            console.log(`                 Song: ${songTitle} \n `);
+            console.log(`                Album: ${albumTitle} \n `);
+            console.log(`    Log-in to preview: ${prevURL} \n `);
+        };
+    });
+
+
+// OMDB
+} else if (userReq === "movie-this" && !userSearch) {
+    request(mrNobody, function (err, response, body) {
+        if (err) {
+            console.log(` \n${err}: \nPlease revise your program. \n `);
+
+        } else {
+            var parseBody = JSON.parse(body);
+            var movieTitle = parseBody.Title;
+            var moviePlot = parseBody.Plot;
+            var movieRel = parseBody.Year;
+            var movieAct = parseBody.Actors;
+            var movieLang = parseBody.Language;
+            var movieOrig = parseBody.Country;
+            var movieIMDB = parseBody.imdbRating;
+            var rottTom = parseBody.Ratings[1].Value;
+            var movieLink = "http://www.imdb.com/title/tt0485947/";
+
+            console.log(` \nYou should watch "${movieTitle}" if you haven't: ${movieLink} \n `);
+
+            console.log("        ✬                     ✬          ");
+            console.log("               MOVIE INFO                 ");
+            console.log("        ✬                     ✬          ");
+            console.log("\n");
+
+            console.log(` Movie:            ${movieTitle} \n `);
+            console.log(` Plot:             ${moviePlot} \n `);
+            console.log(` Released:         ${movieRel} \n `);
+            console.log(` Actors:           ${movieAct} \n `);
+            console.log(` Language:         ${movieLang} \n `);
+            console.log(` Location:         ${movieOrig} \n `);
+            console.log(` IMDB:             ${movieIMDB} \n `);
+            console.log(` Rotten Tomatoes:  ${rottTom} \n `);
+        };
+    });
+
+} else if (userReq === "movie-this" && userSearch) {
+    request(queryURL, function (err, response, body) {
+        if (err) {
+            console.log(` \n${err}: \nPlease revise your program. \n `);
+
+        } else {            
+            var parseBody = JSON.parse(body);
+            var movieTitle = parseBody.Title;
+            var moviePlot = parseBody.Plot;
+            var movieRel = parseBody.Year;
+            var movieAct = parseBody.Actors;
+            var movieLang = parseBody.Language;
+            var movieOrig = parseBody.Country;
+            var movieIMDB = parseBody.imdbRating;
+            var rottTom = parseBody.Ratings[1].Value;
+
+            console.log(` \nYou've search for: "${movieTitle}" \n `);
+
+            console.log("        ✬                     ✬          ");
+            console.log("               MOVIE INFO                 ");
+            console.log("        ✬                     ✬          ");
+            console.log("\n");
+
+            console.log(` Movie:            ${movieTitle} \n `);
+            console.log(` Plot:             ${moviePlot} \n `);
+            console.log(` Released:         ${movieRel} \n `);
+            console.log(` Actors:           ${movieAct} \n `);
+            console.log(` Language:         ${movieLang} \n `);
+            console.log(` Location:         ${movieOrig} \n `);
+            console.log(` IMDB:             ${movieIMDB} \n `);
+            console.log(` Rotten Tomatoes:  ${rottTom} \n `);
+        };
+    });
+} else if (userReq === "do-what-it-says") {
+
+}
