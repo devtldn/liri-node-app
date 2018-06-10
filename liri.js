@@ -182,5 +182,43 @@ if (userReq === "my-tweets") {
         };
     });
 } else if (userReq === "do-what-it-says") {
+    fs.readFile("random.txt", "utf-8", function(err, data) {
+        if (err) {
+            console.log(` \n${err}: \nPlease revise your program. \n `);
 
-}
+        } else {
+            var dataArr = data.split(",");
+
+            console.log("\n");
+            console.log("             ✵    TXT RESULTS    ✵             ");
+            console.log("\n");
+
+            for (var t = 1; t < dataArr.length; t++) {
+                var dwisInput = dataArr[t];
+
+                clientSpot.search({
+                    type: 'track',
+                    query: dwisInput
+                }, function (err, music) {
+                    if (err) {
+                        console.log(` \n${err}: \nPlease revise your program. \n `);
+
+                    } else {
+                        var searchInfo = music.tracks.items[0];
+                        var artistName = searchInfo.artists[0].name;
+                        var songTitle = searchInfo.name;
+                        var albumTitle = searchInfo.album.name;
+                        var prevURL = searchInfo.external_urls.spotify;
+
+                        console.log(`               Artist: ${artistName} \n `);
+                        console.log(`                 Song: ${songTitle} \n `);
+                        console.log(`                Album: ${albumTitle} \n `);
+                        console.log(`    Log-in to preview: ${prevURL} \n `);
+                    };
+                });
+            };
+        };
+    });
+} else {
+    return false;
+};
