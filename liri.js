@@ -31,7 +31,7 @@ if (userReq === "my-tweets") {
 
     function retData(err, tweets) {
         if (err) {
-            console.log(` \n${err}: \nPlease revise your program. \n `);
+            console.log(` \n${err}. \nPlease revise your program. \n `);
 
         } else {
             console.log("\n");
@@ -58,13 +58,13 @@ if (userReq === "my-tweets") {
         query: 'The Sign'
     }, function(err, music) {
         if (err) {
-            console.log(` \n${err}: \nPlease revise your program. \n `);
+            console.log(` \n${err}. \nPlease revise your program. \n `);
 
         } else {
             console.log("\nRETREIVING SAMPLE RESULTS... \n\n");
 
             console.log("              ✰                    ✰            ");
-            console.log("            ✰     SAMPLE RESULTS     ✰            ");
+            console.log("            ✰     SAMPLE SEARCH      ✰            ");
             console.log("              ✰                    ✰            ");
             console.log("\n");
 
@@ -87,10 +87,10 @@ if (userReq === "my-tweets") {
         query: userSearch
     }, function (err, music) {
         if (err) {
-            console.log(` \n${err}: \nPlease revise your program. \n `);
+            console.log(` \n${err}. \nPlease revise your program. \n `);
 
         } else {
-            console.log(` \nSEARCHING: '${userSearch}' \n\n`);
+            console.log(` \nSEARCHING: "${userSearch}"* \n\n`);
 
             console.log("              ✰                  ✰            ");
             console.log("            ✰     YOUR RESULTS     ✰            ");
@@ -108,6 +108,16 @@ if (userReq === "my-tweets") {
             console.log(`                 Song: ${songTitle} \n `);
             console.log(`                Album: ${albumTitle} \n `);
             console.log(`    Log-in to preview: ${prevURL} \n `);
+            
+            var searchHist = `\n"${songTitle}" - ${artistName}`;
+
+            fs.appendFile("log.txt", searchHist, function (err) {
+                if (err) {
+                    console.log(` \n${err}. \nPlease revise your program. \n`);
+                } else {
+                    console.log("\n*Log updated. Check the local log.txt to view your search history. \n");
+                };
+            });
         };
     });
 
@@ -116,7 +126,7 @@ if (userReq === "my-tweets") {
 } else if (userReq === "movie-this" && !userSearch) {
     request(mrNobody, function (err, response, body) {
         if (err) {
-            console.log(` \n${err}: \nPlease revise your program. \n `);
+            console.log(` \n${err}. \nPlease revise your program. \n `);
 
         } else {
             var parseBody = JSON.parse(body);
@@ -151,7 +161,7 @@ if (userReq === "my-tweets") {
 } else if (userReq === "movie-this" && userSearch) {
     request(queryURL, function (err, response, body) {
         if (err) {
-            console.log(` \n${err}: \nPlease revise your program. \n `);
+            console.log(` \n${err}. \nPlease revise your program. \n `);
 
         } else {            
             var parseBody = JSON.parse(body);
@@ -187,7 +197,7 @@ if (userReq === "my-tweets") {
 } else if (userReq === "do-what-it-says") {
     fs.readFile("random.txt", "utf-8", function(err, data) {
         if (err) {
-            console.log(` \n${err}: \nPlease revise your program. \n `);
+            console.log(` \n${err}. \nPlease revise your program. \n `);
 
         } else {
             var dataArr = data.split(",");
@@ -204,7 +214,7 @@ if (userReq === "my-tweets") {
                     query: dwisInput
                 }, function (err, music) {
                     if (err) {
-                        console.log(` \n${err}: \nPlease revise your program. \n `);
+                        console.log(` \n${err}. \nPlease revise your program. \n `);
 
                     } else {
                         var searchInfo = music.tracks.items[0];
